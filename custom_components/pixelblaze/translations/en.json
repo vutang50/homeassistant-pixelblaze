@@ -1,0 +1,20 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Hostname or IP"
+                },
+                "description": "Pixelblaze must be powered up prior to setup, and do not log in to the web UI at the same time during setup"
+            }
+        }
+    },
+    "title": "Pixelblaze"
+}

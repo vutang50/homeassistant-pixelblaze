@@ -1,0 +1,16 @@
+{
+  "domain": "pixelblaze",
+  "name": "Pixelblaze",
+  "config_flow": true,
+  "documentation": "https://www.home-assistant.io/integrations/pixelblaze",
+  "requirements": [
+    "websocket_client==0.57.0"
+  ],
+  "ssdp": [],
+  "zeroconf": [],
+  "homekit": {},
+  "dependencies": [],
+  "codeowners": [
+    "@vutang50"
+  ]
+}
