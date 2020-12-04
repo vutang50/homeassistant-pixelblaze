@@ -3,7 +3,7 @@ This is a custom component integration to allow control of [Pixelblaze](https://
 
 This component appears to home assistant as a light device which you can control the brightness, the pattern from the installed pattern list, and if the pattern supports it, a single color picker.  This works well with the [Light Entity Card](https://github.com/ljmerza/light-entity-card)
 
-![Custom Light Entity Lovelace Card](https://raw.githubusercontent.com/vutang50/homeassistant-pixelblaze/master/img/fullcard.png)
+![Custom Light Entity Lovelace Card](https://github.com/vutang50/homeassistant-pixelblaze/blob/main/img/fullcard.png?raw=true)
 
 
 
