@@ -1,5 +1,5 @@
 # Pixelblaze controller for Home Assistant
-This is a custom component integration to allow control of [Pixelblaze](https://electromage.com/) devices in Home Assistant.  It incorporates the [pixelblaze-client](https://github.com/zranger1/pixelblaze-client), so many thanks to [zranger1](https://github.com/zranger1) for all the great work there. 
+This is a custom component integration to allow control of [Pixelblaze](https://electromage.com/) devices in [Home Assistant](https://www.home-assistant.io/).  It incorporates the [pixelblaze-client](https://github.com/zranger1/pixelblaze-client), so many thanks to [zranger1](https://github.com/zranger1) for all the great work there. 
 
 This component appears to home assistant as a light device which you can control the brightness, start the sequencer, set the pattern from the installed pattern list, and if the pattern supports it, a single color picker.  This works well with the [Light Entity Card](https://github.com/ljmerza/light-entity-card)
 
