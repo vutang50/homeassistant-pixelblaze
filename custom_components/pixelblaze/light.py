@@ -1,5 +1,6 @@
 from .const import (
     DOMAIN,
+    CONFIG,
     PB_ATTR_HSV,
     PB_ATTR_RGB,
     EFFECT_SEQUENCER
@@ -28,6 +29,19 @@ from homeassistant.util.color import color_hs_to_RGB
 
 SUPPORTED_FEATURES_BASE = (SUPPORT_BRIGHTNESS | SUPPORT_EFFECT)
 
+def setup_platform(hass, config, add_entities, discovery_info=None):
+    """Set up the lights from config"""
+    entList = []
+    devList = hass.data[DOMAIN][CONFIG]
+    for dev in devList:
+        entList.append( PixelblazeEntity(
+            dev[CONF_HOST],
+            dev[CONF_NAME]
+            )
+        )
+
+    add_entities( entList )
+
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up lights for device"""
     dev = hass.data[DOMAIN][config_entry.entry_id]
@@ -45,6 +59,7 @@ class PixelblazeEntity(LightEntity, RestoreEntity):
         self._color = None
         self.colorPickerKey = None
         self._supported = None
+        self._effect = None
 
         ## TODO: ASYNC??
         pb = Pixelblaze(host)

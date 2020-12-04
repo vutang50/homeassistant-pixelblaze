@@ -6,13 +6,30 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
+from .const import DOMAIN, CONFIG
+
+import homeassistant.helpers.config_validation as cv
+from homeassistant.const import (CONF_HOST,CONF_NAME)
+
+HOST_CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_HOST): cv.string,
+        vol.Required(CONF_NAME): cv.string,
+    }
+)
+
+CONFIG_SCHEMA = vol.Schema(
+    {DOMAIN: vol.All(cv.ensure_list, [HOST_CONFIG_SCHEMA])}, extra=vol.ALLOW_EXTRA
+)
 
 PLATFORMS = ["light"]
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Pixelblaze component."""
     hass.data[DOMAIN] = {}
+    if config[DOMAIN] is not None:
+        hass.data[DOMAIN][CONFIG] = config[DOMAIN]
+        hass.helpers.discovery.load_platform('light', DOMAIN, {}, config)
     return True
 
 

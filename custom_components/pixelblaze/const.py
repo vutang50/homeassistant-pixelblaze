@@ -2,6 +2,8 @@
 
 DOMAIN = "pixelblaze"
 
+CONFIG = "config"
+
 PB_ATTR_HSV = 'hsvPicker'
 PB_ATTR_RGB = 'rgbPicker'
 
