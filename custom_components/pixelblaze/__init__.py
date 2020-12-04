@@ -27,7 +27,7 @@ PLATFORMS = ["light"]
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Pixelblaze component."""
     hass.data[DOMAIN] = {}
-    if config[DOMAIN] is not None:
+    if DOMAIN in config: 
         hass.data[DOMAIN][CONFIG] = config[DOMAIN]
         hass.helpers.discovery.load_platform('light', DOMAIN, {}, config)
     return True
