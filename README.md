@@ -6,6 +6,8 @@ This component appears to home assistant as a light device which you can control
 ![Custom Light Entity Lovelace Card](https://github.com/vutang50/homeassistant-pixelblaze/blob/main/img/fullcard.png?raw=true)
 
 
+## Known Issues
+This component will not poll the pixelblaze for current state.  If a pattern is selected outside of the component, it will not be updated in HA.  There is no support to control any custom slider at the moment
 
 ## Installing
 
@@ -15,11 +17,32 @@ Manual steps:
 
 
 ## Configuration
-To add integration use Configuration -> Integrations -> Add `Pixelblaze`.  Please be sure to close any web interfaces directly to the Pixelblaze during setup, or while you are controlling it.  
+Please be sure to close any web interfaces directly to the Pixelblaze during setup, or while you are controlling it. See [Known Issues](https://github.com/zranger1/pixelblaze-client#known-issues) of the python client.  There are multiple ways this can be configured
 
+### Integrations Page
+> This is the preferred method.
+
+1. Goto the `Configuration` -> `Integrations` page.  
+2. On the bottom right of the page, click on the Orange `+` sign to add an integration.
+3. Search for `Pixelblaze`. (If you don't see it, try refreshing your browser page to reload the cache.)
+4. Enter the required information. 
 
 Fields name | Type | Required | Default | Description
 --- | --- | --- | --- | --- |
 Host | Textbox | + | - | Hostname or IP address to access Pixelblaze device
+5. No reboot is required. 
 
+### Configuration.yaml
+While this still works, it will be deprecated in the future. Please use [Integrations](#integrations-page).
+Once the files are downloaded, you’ll need to **update your config** to include the following under the **`pixelblaze` domain**:
+
+```yaml
+pixelblaze:
+  - host: my_pixelblaze_hostname.my.domain
+    name: kitchen_lamp
+  - host: 10.10.10.10
+    name: living_room_tv
+```
+
+restart and it works
 
