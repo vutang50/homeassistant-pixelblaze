@@ -2,7 +2,8 @@
   "domain": "pixelblaze",
   "name": "Pixelblaze",
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/pixelblaze",
+  "documentation": "https://github.com/vutang50/homeassistant-pixelblaze",
+  "issue_tracker": "https://github.com/vutang50/homeassistant-pixelblaze/issues",
   "requirements": [
     "websocket_client==0.57.0"
   ],
