@@ -1,0 +1,9 @@
+{
+    "name": "Pixelblaze",
+    "hacs": "1.6.0",
+    "domains": [
+        "light"
+    ],
+    "iot_class": [ "Assumed State", "Local Polling" ],
+    "homeassistant": "0.118.0"
+}
