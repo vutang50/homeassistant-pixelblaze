@@ -13,7 +13,7 @@ This component will not poll the pixelblaze for current state.  If a pattern is 
 
 Manual steps:
 1. Download or clone this project, and place the `custom_components` folder and its contents into your Home Assistant config folder.
-2. Ensure `light.py`, `pixelblaze.py` and related files are located in a folder named `pixelblaze` within the `custom_components` folder.
+2. Ensure `light.py` and related files are located in a folder named `pixelblaze` within the `custom_components` folder.
 
 
 ## Configuration
