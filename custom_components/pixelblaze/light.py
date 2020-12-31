@@ -6,7 +6,7 @@ from .const import (
     EFFECT_SEQUENCER
 )
 
-from .pixelblaze import Pixelblaze
+from pixelblaze import Pixelblaze
 
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,

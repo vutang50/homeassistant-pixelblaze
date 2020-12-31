@@ -5,7 +5,8 @@
   "documentation": "https://github.com/vutang50/homeassistant-pixelblaze",
   "issue_tracker": "https://github.com/vutang50/homeassistant-pixelblaze/issues",
   "requirements": [
-    "websocket_client==0.57.0"
+    "websocket_client==0.57.0",
+    "pixelblaze-client==0.9.1"
   ],
   "ssdp": [],
   "zeroconf": [],

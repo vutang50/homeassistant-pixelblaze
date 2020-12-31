@@ -9,7 +9,7 @@ from .const import DOMAIN  # pylint:disable=unused-import
 
 from homeassistant.const import ( CONF_HOST, CONF_NAME )
 
-from .pixelblaze import Pixelblaze
+from pixelblaze import Pixelblaze
 
 _LOGGER = logging.getLogger(__name__)
 
