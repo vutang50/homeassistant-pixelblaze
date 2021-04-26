@@ -61,6 +61,7 @@ class PixelblazeEntity(LightEntity):
         self._effect_list = None
         self.init_pattern_list = False
         self.activePID = None
+        self.patternlist = ()
 
     async def async_device_update(self):
         _LOGGER.debug(f"Device Update for {self.id}")
@@ -73,12 +74,7 @@ class PixelblazeEntity(LightEntity):
                 _LOGGER.debug(pb_config)
                 if not self.init_pattern_list:
                     ## DO ONCE: Get the pattern list and set the patterns names as the effect list
-                    self.patternlist = pb.getPatternList()
-                    l = list(self.patternlist.values())
-                    l.sort(key=str.lower)
-                    l.insert(0, EFFECT_SEQUENCER)
-                    self._effect_list = l
-                    self.init_pattern_list = True
+                    self.updatePatternList(pb)
 
                 self._brightness = pb_config[PB_BRIGHTNESS] * 255
 
@@ -92,11 +88,21 @@ class PixelblazeEntity(LightEntity):
         finally:
             pb.close()
 
+    def updatePatternList(self, pixelblaze: Pixelblaze):
+        self.patternlist = pixelblaze.getPatternList()
+        l = list(self.patternlist.values())
+        l.sort(key=str.lower)
+        l.insert(0, EFFECT_SEQUENCER)
+        self._effect_list = l
+        self.init_pattern_list = True
+
     def updateActivePattern(self, pixelblaze: Pixelblaze, activePID):
         """Updates the current pattern and sets the correct supported features for this effect"""
         _LOGGER.debug(f"Updating running pattern on {self.id}")
         self.activePID = activePID
         if self.activePID is not None and len(self.activePID) > 0:
+            if activePID not in self.patternlist:
+                self.updatePatternList(pixelblaze)
             self._effect = self.patternlist[activePID]
         if pixelblaze.getColorControlName() is None:
             self._supported = SUPPORTED_FEATURES_BASE
