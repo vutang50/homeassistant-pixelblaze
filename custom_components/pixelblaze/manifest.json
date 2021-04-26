@@ -6,7 +6,7 @@
   "issue_tracker": "https://github.com/vutang50/homeassistant-pixelblaze/issues",
   "requirements": [
     "websocket_client==0.57.0",
-    "pixelblaze-client==0.9.1"
+    "pixelblaze-client==0.9.2"
   ],
   "ssdp": [],
   "zeroconf": [],
@@ -14,5 +14,6 @@
   "dependencies": [],
   "codeowners": [
     "@vutang50"
-  ]
+  ],
+  "version": "2021.5"
 }
