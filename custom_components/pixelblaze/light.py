@@ -82,13 +82,14 @@ class PixelblazeEntity(LightEntity):
                     self._effect = EFFECT_SEQUENCER
                 else:
                     pid = pb_config[PB_ACTIVE_PROG][PB_ACTIVE_PROG_ID]
-                    if pid is not self.activePID:
+                    if pid != self.activePID:
                         self.updateActivePattern(pb, pid)
 
         finally:
             pb.close()
 
     def updatePatternList(self, pixelblaze: Pixelblaze):
+        _LOGGER.debug(f"Updating pattern list for {self.id}")
         self.patternlist = pixelblaze.getPatternList()
         l = list(self.patternlist.values())
         l.sort(key=str.lower)
