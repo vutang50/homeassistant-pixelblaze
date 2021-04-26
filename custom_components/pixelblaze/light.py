@@ -60,6 +60,7 @@ class PixelblazeEntity(LightEntity):
         self._effect = None
         self._effect_list = None
         self.init_pattern_list = False
+        self.activePID = None
 
     async def async_device_update(self):
         _LOGGER.debug(f"Device Update for {self.id}")
