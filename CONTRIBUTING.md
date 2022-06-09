@@ -21,7 +21,7 @@ Pull requests are the best way to propose changes to the codebase.
 
 ## Any contributions you make will be under the MIT Software License
 
-In short, when you submit code changes, your submissions are understood to be under the same [GPL 3.0](https://choosealicense.com/licenses/gpl-3.0/) that covers the project. Feel free to contact the maintainers if that's a concern.
+In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using Github's [issues](../../issues)
 
@@ -53,9 +53,9 @@ This custom component is based on [integration_blueprint template](https://githu
 It comes with development environment in a container, easy to launch
 if you use Visual Studio Code. With this container you will have a stand alone
 Home Assistant instance running and already configured with the included
-[`.devcontainer/configuration.yaml`](https://github.com/oncleben31/ha-pool_pump/blob/master/.devcontainer/configuration.yaml)
+[`.devcontainer/configuration.yaml`](./.devcontainer/configuration.yaml)
 file.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under its GPL License.
+By contributing, you agree that your contributions will be licensed under its MIT License.
