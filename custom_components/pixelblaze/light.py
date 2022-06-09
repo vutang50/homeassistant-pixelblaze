@@ -54,6 +54,7 @@ class PixelblazeEntity(LightEntity):
         self.id = unique_id
         self.host = host
         self._brightness = 0
+        self._last_brightness = 0
         self._color = None
         self.colorPickerKey = None
         self._supported = SUPPORTED_FEATURES_BASE
@@ -159,21 +160,26 @@ class PixelblazeEntity(LightEntity):
 
     def turn_off(self, **kwargs):
         """Set the brightness to 0"""
+        _LOGGER.debug(f"turn off for {self.id}")
         try:
             pb = Pixelblaze(self.host)
+            self._last_brightness = self._brightness
             pb.setBrightness(0)
             self.schedule_update_ha_state()
         finally:
             pb.close()
 
     def turn_on(self, **kwargs):
-        """Turn on (or djust property of) the lights."""
+        """Turn on (or adjust property of) the lights."""
         _LOGGER.debug(f"turn_on for {self.id}")
         try:
             pb = Pixelblaze(self.host)
+
             if ATTR_BRIGHTNESS in kwargs:
                 self._brightness = kwargs[ATTR_BRIGHTNESS]
-                pb.setBrightness(self._brightness / 255)
+            else:
+                self._brightness = self._last_brightness
+            pb.setBrightness(self._brightness / 255)
 
             if ATTR_EFFECT in kwargs:
                 self._effect = kwargs[ATTR_EFFECT]
