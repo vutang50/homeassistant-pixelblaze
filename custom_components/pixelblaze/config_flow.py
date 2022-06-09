@@ -1,54 +1,55 @@
 """Config flow for Pixelblaze integration."""
+# pylint: disable=logging-fstring-interpolation
 import logging
 
 import voluptuous as vol
 
 from homeassistant import config_entries, core, exceptions
 
-from .const import DOMAIN  # pylint:disable=unused-import
-
-from homeassistant.const import ( CONF_HOST, CONF_NAME )
+from homeassistant.const import CONF_HOST, CONF_NAME
 
 from pixelblaze import Pixelblaze
 
+from .const import DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
 
-# TODO adjust the data schema to the data that you need
 STEP_USER_DATA_SCHEMA = vol.Schema({CONF_HOST: str})
 
-def pixelblaze_connect( host : str ):
+
+def pixelblaze_connect(host: str):
+    """Try connecting to the local pixelblaze device"""
+    # pylint: disable=invalid-name
     try:
         pb = Pixelblaze(host)
-        dev_name = pb.getHardwareConfig()['name']
-        if dev_name is None: dev_name=host
+        dev_name = pb.getHardwareConfig()["name"]
+        if dev_name is None:
+            dev_name = host
         pb.close()
         return dev_name
-    except Exception as e:
-        _LOGGER.exception("Unable to connect to " + host, exc_info=e)
+    except Exception as e:  # pylint:disable=broad-except
+        _LOGGER.exception(f"Unable to connect to {host}", exc_info=e)
         return None
+
 
 async def validate_input(hass: core.HomeAssistant, data):
     """Validate the user input allows us to connect.
 
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
-    dev_name = await hass.async_add_executor_job( pixelblaze_connect, data[CONF_HOST] )
+    dev_name = await hass.async_add_executor_job(pixelblaze_connect, data[CONF_HOST])
     if dev_name is None:
         raise CannotConnect
 
     # Return info that you want to store in the config entry.
-    return {
-        CONF_NAME: dev_name,
-        CONF_HOST: data[CONF_HOST]
-    }
+    return {CONF_NAME: dev_name, CONF_HOST: data[CONF_HOST]}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Pixelblaze."""
 
     VERSION = 1
-    # TODO pick one of the available connection classes in homeassistant/config_entries.py
-    CONNECTION_CLASS = config_entries.CONN_CLASS_UNKNOWN
+    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""

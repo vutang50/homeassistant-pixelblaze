@@ -1,6 +1,6 @@
+"""Light platform for Pixelblaze."""
+# pylint: disable=logging-fstring-interpolation
 import logging
-
-from .const import DOMAIN, CONFIG, PB_ATTR_HSV, PB_ATTR_RGB, EFFECT_SEQUENCER
 
 from pixelblaze import Pixelblaze
 
@@ -14,10 +14,11 @@ from homeassistant.components.light import (
     LightEntity,
 )
 
-from homeassistant.const import CONF_HOST, CONF_NAME, STATE_ON
+from homeassistant.const import CONF_HOST, CONF_NAME
 
-from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util.color import color_hs_to_RGB
+
+from .const import DOMAIN, CONFIG, PB_ATTR_HSV, PB_ATTR_RGB, EFFECT_SEQUENCER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,12 +33,13 @@ PB_SEQUENCER = "runSequencer"
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
     """Set up the lights from config"""
-    entList = []
-    devList = hass.data[DOMAIN][CONFIG]
-    for dev in devList:
-        entList.append(PixelblazeEntity(dev[CONF_HOST], dev[CONF_NAME]))
+    # pylint: disable=unused-argument
+    ent_list = []
+    dev_list = hass.data[DOMAIN][CONFIG]
+    for dev in dev_list:
+        ent_list.append(PixelblazeEntity(dev[CONF_HOST], dev[CONF_NAME]))
 
-    add_entities(entList)
+    add_entities(ent_list)
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -51,20 +53,21 @@ class PixelblazeEntity(LightEntity):
 
     def __init__(self, host, unique_id):
         """Initialize the light."""
-        self.id = unique_id
+        self.id = unique_id  # pylint: disable=invalid-name
         self.host = host
         self._brightness = 0
         self._last_brightness = 0
         self._color = None
-        self.colorPickerKey = None
+        self.color_picker_key = None
         self._supported = SUPPORTED_FEATURES_BASE
         self._effect = None
         self._effect_list = None
         self.init_pattern_list = False
-        self.activePID = None
+        self.active_pid = None
         self.patternlist = ()
 
     async def async_device_update(self):
+        # pylint: disable=arguments-differ, invalid-name
         _LOGGER.debug(f"Device Update for {self.id}")
         try:
             pb = Pixelblaze(self.host)
@@ -75,7 +78,7 @@ class PixelblazeEntity(LightEntity):
                 _LOGGER.debug(pb_config)
                 if not self.init_pattern_list:
                     ## DO ONCE: Get the pattern list and set the patterns names as the effect list
-                    self.updatePatternList(pb)
+                    self.update_pattern_list(pb)
 
                 self._brightness = pb_config[PB_BRIGHTNESS] * 255
 
@@ -83,29 +86,30 @@ class PixelblazeEntity(LightEntity):
                     self._effect = EFFECT_SEQUENCER
                 else:
                     pid = pb_config[PB_ACTIVE_PROG][PB_ACTIVE_PROG_ID]
-                    if pid != self.activePID:
-                        self.updateActivePattern(pb, pid)
+                    if pid != self.active_pid:
+                        self.update_active_pattern(pb, pid)
 
         finally:
             pb.close()
 
-    def updatePatternList(self, pixelblaze: Pixelblaze):
+    def update_pattern_list(self, pixelblaze: Pixelblaze):
+        """Updates the pattern list"""
         _LOGGER.debug(f"Updating pattern list for {self.id}")
         self.patternlist = pixelblaze.getPatternList()
-        l = list(self.patternlist.values())
-        l.sort(key=str.lower)
-        l.insert(0, EFFECT_SEQUENCER)
-        self._effect_list = l
+        p_list = list(self.patternlist.values())
+        p_list.sort(key=str.lower)
+        p_list.insert(0, EFFECT_SEQUENCER)
+        self._effect_list = p_list
         self.init_pattern_list = True
 
-    def updateActivePattern(self, pixelblaze: Pixelblaze, activePID):
+    def update_active_pattern(self, pixelblaze: Pixelblaze, active_pid):
         """Updates the current pattern and sets the correct supported features for this effect"""
         _LOGGER.debug(f"Updating running pattern on {self.id}")
-        self.activePID = activePID
-        if self.activePID is not None and len(self.activePID) > 0:
-            if activePID not in self.patternlist:
-                self.updatePatternList(pixelblaze)
-            self._effect = self.patternlist[activePID]
+        self.active_pid = active_pid
+        if self.active_pid is not None and len(self.active_pid) > 0:
+            if active_pid not in self.patternlist:
+                self.update_pattern_list(pixelblaze)
+            self._effect = self.patternlist[active_pid]
         if pixelblaze.getColorControlName() is None:
             self._supported = SUPPORTED_FEATURES_BASE
         else:
@@ -162,7 +166,7 @@ class PixelblazeEntity(LightEntity):
         """Set the brightness to 0"""
         _LOGGER.debug(f"turn off for {self.id}")
         try:
-            pb = Pixelblaze(self.host)
+            pb = Pixelblaze(self.host)  # pylint: disable=invalid-name
             self._last_brightness = self._brightness
             pb.setBrightness(0)
             self.schedule_update_ha_state()
@@ -173,7 +177,7 @@ class PixelblazeEntity(LightEntity):
         """Turn on (or adjust property of) the lights."""
         _LOGGER.debug(f"turn_on for {self.id}")
         try:
-            pb = Pixelblaze(self.host)
+            pb = Pixelblaze(self.host)  # pylint: disable=invalid-name
 
             if ATTR_BRIGHTNESS in kwargs:
                 self._brightness = kwargs[ATTR_BRIGHTNESS]
@@ -192,21 +196,21 @@ class PixelblazeEntity(LightEntity):
                     for pid, pname in self.patternlist.items():
                         if self._effect == pname:
                             pb.setActivePattern(pid)
-                            self.updateActivePattern(pb, pid)
+                            self.update_active_pattern(pb, pid)
                             break
 
             if ATTR_HS_COLOR in kwargs:
                 # Only set the color if controls allow for it
-                colorPickerKey = pb.getColorControlName()
-                if colorPickerKey is not None:
+                color_picker_key = pb.getColorControlName()
+                if color_picker_key is not None:
                     self._color = kwargs[ATTR_HS_COLOR]
-                    if colorPickerKey.startswith(PB_ATTR_HSV):
+                    if color_picker_key.startswith(PB_ATTR_HSV):
                         hsv = (self._color[0] / 360, self._color[1] / 100, 1)
-                        pb.setColorControl(colorPickerKey, hsv)
-                    elif colorPickerKey.startswith(PB_ATTR_RGB):
+                        pb.setColorControl(color_picker_key, hsv)
+                    elif color_picker_key.startswith(PB_ATTR_RGB):
                         rgb = color_hs_to_RGB(*tuple(self._color))
                         pb.setColorControl(
-                            colorPickerKey, (rgb[0] / 255, rgb[1] / 255, rgb[2] / 255)
+                            color_picker_key, (rgb[0] / 255, rgb[1] / 255, rgb[2] / 255)
                         )
             self.schedule_update_ha_state()
         finally:
