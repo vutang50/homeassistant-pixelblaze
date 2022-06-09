@@ -56,7 +56,7 @@ class PixelblazeEntity(LightEntity):
         self.id = unique_id  # pylint: disable=invalid-name
         self.host = host
         self._brightness = 0
-        self._last_brightness = 0
+        self._last_brightness = 64
         self._color = None
         self.color_picker_key = None
         self._supported = SUPPORTED_FEATURES_BASE
@@ -181,6 +181,7 @@ class PixelblazeEntity(LightEntity):
 
             if ATTR_BRIGHTNESS in kwargs:
                 self._brightness = kwargs[ATTR_BRIGHTNESS]
+                self._last_brightness = self._brightness
             else:
                 self._brightness = self._last_brightness
             pb.setBrightness(self._brightness / 255)
