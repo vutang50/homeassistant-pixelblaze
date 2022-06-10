@@ -71,26 +71,31 @@ class PixelblazeEntity(LightEntity):
         _LOGGER.debug(f"Device Update for {self.id}")
         try:
             pb = Pixelblaze(self.host)
-            pb_config = pb.getHardwareConfig()
-            if PB_BRIGHTNESS not in pb_config:
-                _LOGGER.warning(f"Empty query hardware config for {self.id}")
-            else:
-                _LOGGER.debug(pb_config)
-                if not self.init_pattern_list:
-                    ## DO ONCE: Get the pattern list and set the patterns names as the effect list
-                    self.update_pattern_list(pb)
-
-                self._brightness = pb_config[PB_BRIGHTNESS] * 255
-
-                if pb_config[PB_SEQUENCER]:
-                    self._effect = EFFECT_SEQUENCER
+            try:
+                pb_config = pb.getHardwareConfig()
+                if PB_BRIGHTNESS not in pb_config:
+                    _LOGGER.warning(f"Empty query hardware config for {self.id}")
                 else:
-                    pid = pb_config[PB_ACTIVE_PROG][PB_ACTIVE_PROG_ID]
-                    if pid != self.active_pid:
-                        self.update_active_pattern(pb, pid)
+                    _LOGGER.debug(pb_config)
+                    if not self.init_pattern_list:
+                        ## DO ONCE: Get pattern list and set patterns names as the effect list
+                        self.update_pattern_list(pb)
 
-        finally:
-            pb.close()
+                    self._brightness = pb_config[PB_BRIGHTNESS] * 255
+
+                    if pb_config[PB_SEQUENCER]:
+                        self._effect = EFFECT_SEQUENCER
+                    else:
+                        pid = pb_config[PB_ACTIVE_PROG][PB_ACTIVE_PROG_ID]
+                        if pid != self.active_pid:
+                            self.update_active_pattern(pb, pid)
+
+            finally:
+                pb.close()
+        except Exception as e:  # pylint:disable=broad-except,invalid-name
+            _LOGGER.error(
+                f"Failed to update pixelblaze device {self.id}@{self.host}: Exception: {e}"
+            )
 
     def update_pattern_list(self, pixelblaze: Pixelblaze):
         """Updates the pattern list"""
@@ -165,54 +170,66 @@ class PixelblazeEntity(LightEntity):
     def turn_off(self, **kwargs):
         """Set the brightness to 0"""
         _LOGGER.debug(f"turn off for {self.id}")
+
         try:
             pb = Pixelblaze(self.host)  # pylint: disable=invalid-name
-            self._last_brightness = self._brightness
-            pb.setBrightness(0)
-            self.schedule_update_ha_state()
-        finally:
-            pb.close()
+            try:
+                pb.setBrightness(0)
+                self._last_brightness = self._brightness
+                self.schedule_update_ha_state()
+            finally:
+                pb.close()
+        except Exception as e:  # pylint:disable=broad-except,invalid-name
+            _LOGGER.error(
+                f"Failed to turn_off pixelblaze device {self.id}@{self.host}: Exception: {e}"
+            )
 
     def turn_on(self, **kwargs):
         """Turn on (or adjust property of) the lights."""
         _LOGGER.debug(f"turn_on for {self.id}")
+
         try:
             pb = Pixelblaze(self.host)  # pylint: disable=invalid-name
-
-            if ATTR_BRIGHTNESS in kwargs:
-                self._brightness = kwargs[ATTR_BRIGHTNESS]
-                self._last_brightness = self._brightness
-            else:
-                self._brightness = self._last_brightness
-            pb.setBrightness(self._brightness / 255)
-
-            if ATTR_EFFECT in kwargs:
-                self._effect = kwargs[ATTR_EFFECT]
-                if EFFECT_SEQUENCER == self._effect:
-                    self._supported = SUPPORTED_FEATURES_BASE
-                    pb.startSequencer()
+            try:
+                if ATTR_BRIGHTNESS in kwargs:
+                    self._brightness = kwargs[ATTR_BRIGHTNESS]
+                    self._last_brightness = self._brightness
                 else:
-                    # Stop any sequencer and find the matching patternID to the name
-                    pb.stopSequencer()
-                    for pid, pname in self.patternlist.items():
-                        if self._effect == pname:
-                            pb.setActivePattern(pid)
-                            self.update_active_pattern(pb, pid)
-                            break
+                    self._brightness = self._last_brightness
+                pb.setBrightness(self._brightness / 255)
 
-            if ATTR_HS_COLOR in kwargs:
-                # Only set the color if controls allow for it
-                color_picker_key = pb.getColorControlName()
-                if color_picker_key is not None:
-                    self._color = kwargs[ATTR_HS_COLOR]
-                    if color_picker_key.startswith(PB_ATTR_HSV):
-                        hsv = (self._color[0] / 360, self._color[1] / 100, 1)
-                        pb.setColorControl(color_picker_key, hsv)
-                    elif color_picker_key.startswith(PB_ATTR_RGB):
-                        rgb = color_hs_to_RGB(*tuple(self._color))
-                        pb.setColorControl(
-                            color_picker_key, (rgb[0] / 255, rgb[1] / 255, rgb[2] / 255)
-                        )
-            self.schedule_update_ha_state()
-        finally:
-            pb.close()
+                if ATTR_EFFECT in kwargs:
+                    self._effect = kwargs[ATTR_EFFECT]
+                    if EFFECT_SEQUENCER == self._effect:
+                        self._supported = SUPPORTED_FEATURES_BASE
+                        pb.startSequencer()
+                    else:
+                        # Stop any sequencer and find the matching patternID to the name
+                        pb.stopSequencer()
+                        for pid, pname in self.patternlist.items():
+                            if self._effect == pname:
+                                pb.setActivePattern(pid)
+                                self.update_active_pattern(pb, pid)
+                                break
+
+                if ATTR_HS_COLOR in kwargs:
+                    # Only set the color if controls allow for it
+                    color_picker_key = pb.getColorControlName()
+                    if color_picker_key is not None:
+                        self._color = kwargs[ATTR_HS_COLOR]
+                        if color_picker_key.startswith(PB_ATTR_HSV):
+                            hsv = (self._color[0] / 360, self._color[1] / 100, 1)
+                            pb.setColorControl(color_picker_key, hsv)
+                        elif color_picker_key.startswith(PB_ATTR_RGB):
+                            rgb = color_hs_to_RGB(*tuple(self._color))
+                            pb.setColorControl(
+                                color_picker_key,
+                                (rgb[0] / 255, rgb[1] / 255, rgb[2] / 255),
+                            )
+                self.schedule_update_ha_state()
+            finally:
+                pb.close()
+        except Exception as e:  # pylint:disable=broad-except,invalid-name
+            _LOGGER.error(
+                f"Failed to turn_on pixelblaze device {self.id}@{self.host}: Exception: {e}"
+            )

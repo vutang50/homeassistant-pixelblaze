@@ -4,8 +4,8 @@
             "already_configured": "Device is already configured"
         },
         "error": {
-            "cannot_connect": "Failed to connect",
-            "unknown": "Unexpected error"
+            "cannot_connect": "Failed to connect, see logs for more details",
+            "unknown": "Unexpected error, , see logs for more details"
         },
         "step": {
             "user": {
