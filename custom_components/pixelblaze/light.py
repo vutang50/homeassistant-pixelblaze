@@ -10,8 +10,9 @@ from homeassistant.components.light import (
     ATTR_HS_COLOR,
     SUPPORT_BRIGHTNESS,
     SUPPORT_COLOR,
-    SUPPORT_EFFECT,
+    ColorMode,
     LightEntity,
+    LightEntityFeature,
 )
 
 from homeassistant.const import CONF_HOST, CONF_NAME
@@ -22,7 +23,7 @@ from .const import DOMAIN, CONFIG, PB_ATTR_HSV, PB_ATTR_RGB, EFFECT_SEQUENCER
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORTED_FEATURES_BASE = SUPPORT_BRIGHTNESS | SUPPORT_EFFECT
+SUPPORTED_FEATURES_BASE = SUPPORT_BRIGHTNESS | LightEntityFeature.EFFECT
 COLOR_MODES_BASE = ()
 
 PB_BRIGHTNESS = "brightness"
@@ -151,6 +152,14 @@ class PixelblazeEntity(LightEntity):
         if self._color is None or self._color[1] == 0:
             return None
         return self._color
+
+    @property
+    def color_mode(self):
+        return ColorMode.HS
+
+    @property
+    def supported_color_modes(self):
+        return {ColorMode.HS}
 
     @property
     def supported_features(self):

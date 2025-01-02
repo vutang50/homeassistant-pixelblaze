@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN, CONFIG
 
 import homeassistant.helpers.config_validation as cv
-from homeassistant.const import (CONF_HOST,CONF_NAME)
+from homeassistant.const import (CONF_HOST,CONF_NAME,Platform)
 
 HOST_CONFIG_SCHEMA = vol.Schema(
     {
@@ -22,7 +22,7 @@ CONFIG_SCHEMA = vol.Schema(
     {DOMAIN: vol.All(cv.ensure_list, [HOST_CONFIG_SCHEMA])}, extra=vol.ALLOW_EXTRA
 )
 
-PLATFORMS = ["light"]
+PLATFORMS: list[Platform] = [Platform.LIGHT]
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Pixelblaze component."""
@@ -38,9 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # TODO Store an API object for your platforms to access
     hass.data[DOMAIN][entry.entry_id] = entry.data
     for component in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, component)
-        )
+        await hass.config_entries.async_forward_entry_setups(entry, component)
 
     return True
 
@@ -50,7 +48,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     unload_ok = all(
         await asyncio.gather(
             *[
-                hass.config_entries.async_forward_entry_unload(entry, component)
+                hass.config_entries.async_unload_platforms(entry, component)
                 for component in PLATFORMS
             ]
         )
