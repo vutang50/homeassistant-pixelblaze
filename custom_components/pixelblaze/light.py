@@ -11,6 +11,7 @@ from homeassistant.components.light import (
     SUPPORT_BRIGHTNESS,
     SUPPORT_COLOR,
     SUPPORT_EFFECT,
+    ColorMode,
     LightEntity,
 )
 
@@ -151,6 +152,14 @@ class PixelblazeEntity(LightEntity):
         if self._color is None or self._color[1] == 0:
             return None
         return self._color
+
+    @property
+    def color_mode(self):
+        return ColorMode.HS
+
+    @property
+    def supported_color_modes(self):
+        return {ColorMode.HS}
 
     @property
     def supported_features(self):
