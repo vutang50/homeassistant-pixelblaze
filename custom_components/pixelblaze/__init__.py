@@ -8,6 +8,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN, CONFIG
 
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import discovery
 from homeassistant.const import (CONF_HOST,CONF_NAME)
 
 HOST_CONFIG_SCHEMA = vol.Schema(
@@ -28,7 +29,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
     hass.data[DOMAIN] = {}
     if DOMAIN in config:
         hass.data[DOMAIN][CONFIG] = config[DOMAIN]
-        hass.helpers.discovery.load_platform('light', DOMAIN, {}, config)
+        discovery.load_platform(hass, 'light', DOMAIN, {}, config)
     return True
 
 

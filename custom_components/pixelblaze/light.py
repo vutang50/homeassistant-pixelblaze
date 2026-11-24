@@ -8,10 +8,9 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_EFFECT,
     ATTR_HS_COLOR,
-    SUPPORT_BRIGHTNESS,
-    SUPPORT_COLOR,
-    SUPPORT_EFFECT,
+    ColorMode,
     LightEntity,
+    LightEntityFeature,
 )
 
 from homeassistant.const import CONF_HOST, CONF_NAME
@@ -22,8 +21,9 @@ from .const import DOMAIN, CONFIG, PB_ATTR_HSV, PB_ATTR_RGB, EFFECT_SEQUENCER
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORTED_FEATURES_BASE = SUPPORT_BRIGHTNESS | SUPPORT_EFFECT
-COLOR_MODES_BASE = ()
+SUPPORTED_FEATURES_BASE = LightEntityFeature.EFFECT
+COLOR_MODES_BASE = {ColorMode.BRIGHTNESS}
+COLOR_MODES_COLOR = {ColorMode.HS}
 
 PB_BRIGHTNESS = "brightness"
 PB_ACTIVE_PROG_ID = "activeProgramId"
@@ -60,14 +60,16 @@ class PixelblazeEntity(LightEntity):
         self._color = None
         self.color_picker_key = None
         self._supported = SUPPORTED_FEATURES_BASE
+        self._color_modes = COLOR_MODES_BASE
         self._effect = None
         self._effect_list = None
         self.init_pattern_list = False
         self.active_pid = None
         self.patternlist = ()
 
-    async def async_device_update(self):
-        # pylint: disable=arguments-differ, invalid-name
+    def update(self):
+        """Fetch state from the device (runs in the executor)."""
+        # pylint: disable=invalid-name
         _LOGGER.debug(f"Device Update for {self.id}")
         try:
             pb = Pixelblaze(self.host)
@@ -116,9 +118,9 @@ class PixelblazeEntity(LightEntity):
                 self.update_pattern_list(pixelblaze)
             self._effect = self.patternlist[active_pid]
         if pixelblaze.getColorControlName() is None:
-            self._supported = SUPPORTED_FEATURES_BASE
+            self._color_modes = COLOR_MODES_BASE
         else:
-            self._supported = SUPPORTED_FEATURES_BASE | SUPPORT_COLOR
+            self._color_modes = COLOR_MODES_COLOR
 
     @property
     def unique_id(self):
@@ -156,6 +158,16 @@ class PixelblazeEntity(LightEntity):
     def supported_features(self):
         """Flag supported features."""
         return self._supported
+
+    @property
+    def supported_color_modes(self):
+        """Return the color modes supported by the current pattern."""
+        return self._color_modes
+
+    @property
+    def color_mode(self):
+        """Return the active color mode."""
+        return next(iter(self._color_modes))
 
     @property
     def effect(self):
@@ -201,7 +213,7 @@ class PixelblazeEntity(LightEntity):
                 if ATTR_EFFECT in kwargs:
                     self._effect = kwargs[ATTR_EFFECT]
                     if EFFECT_SEQUENCER == self._effect:
-                        self._supported = SUPPORTED_FEATURES_BASE
+                        self._color_modes = COLOR_MODES_BASE
                         pb.startSequencer()
                     else:
                         # Stop any sequencer and find the matching patternID to the name
